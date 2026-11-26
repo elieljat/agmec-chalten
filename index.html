@@ -309,10 +309,11 @@ footer .note{margin-left:auto;font-family:var(--f-mono);font-size:11px;letter-sp
 .skyline circle{fill:#fff;filter:drop-shadow(0 0 10px #ffb393);opacity:0;transition:opacity .4s}
 .skyline.on circle{opacity:1}
 .skyline.out{opacity:0}
-.peak{position:absolute;z-index:3;pointer-events:none;transform:translate(-50%,calc(-100% - 16px)) translateY(8px);opacity:0;transition:opacity .7s var(--ease),transform .9s var(--ease);font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#fff;white-space:nowrap;text-align:center;text-shadow:0 1px 10px rgba(5,10,20,.6)}
+.peak{--lift:0px;position:absolute;z-index:3;pointer-events:none;transform:translate(-50%,calc(-100% - 16px - var(--lift))) translateY(8px);opacity:0;transition:opacity .7s var(--ease),transform .9s var(--ease);font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#fff;white-space:nowrap;text-align:center;text-shadow:0 1px 10px rgba(5,10,20,.6)}
 .peak b{display:block;font-family:var(--f-display);font-weight:800;font-size:clamp(16px,1.6vw,22px);letter-spacing:.06em}
-.peak::after{content:"";position:absolute;left:50%;top:calc(100% + 4px);width:1px;height:10px;background:rgba(255,255,255,.8)}
-.peak.on{opacity:1;transform:translate(-50%,calc(-100% - 16px))}
+.peak::after{content:"";position:absolute;left:50%;top:calc(100% + 4px);width:1px;height:calc(10px + var(--lift));background:rgba(255,255,255,.8)}
+.peak.on{opacity:1;transform:translate(-50%,calc(-100% - 16px - var(--lift)))}
+.peak.min{font-size:10px;opacity:0}.peak.min b{font-size:clamp(13px,1.2vw,17px)}.peak.min.on{opacity:.92}
 .peak.off{opacity:0;transition-duration:.6s}
 .hero-shade,.hero-img{transition:opacity 1.3s var(--ease)}
 .hero .wrap>*:not(.logo),.hero .alt,.nav{transition:opacity 1s var(--ease) var(--d,0s),transform 1.1s var(--ease) var(--d,0s)}
@@ -803,7 +804,8 @@ if(tc){topo();addEventListener("resize",topo)}
   const root=document.documentElement,hero=$(".hero"),img=$(".hero-img"),logo=$(".logo"),svg=$(".skyline"),path=svg.querySelector("path"),dot=svg.querySelector("circle"),skip=$(".skip");
   if(!root.classList.contains("intro")){logo.classList.add("go");svg.remove();skip.remove();return}
   const LOGO={x:552,y:40,size:503}; // logo calzado sobre la foto (px de la foto 1600x900)
-  const PEAKS=[[124,349,"Cerro Torre","3128 m"],[706,263,"Aguja Poincenot","3002 m"],[903,200,"Cerro Fitz Roy","3405 m"]];
+  // [x, y en la foto, nombre, altura, elevación extra de la etiqueta, secundaria]
+  const PEAKS=[[124,349,"Cerro Torre","3128 m",0],[500,353,"Aguja Saint-Exupéry","2558 m",0,1],[595,388,"Aguja Rafael Juárez","2482 m",78,1],[706,263,"Aguja Poincenot","3002 m",0],[903,200,"Cerro Fitz Roy","3405 m",0],[1144,358,"Aguja Mermoz","2732 m",0,1],[1244,393,"Aguja Guillaumet","2579 m",70,1]];
   let M,done=false,raf,labels=[],Q=[];
   const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
   function map(){
@@ -841,10 +843,11 @@ if(tc){topo();addEventListener("resize",topo)}
     if(done)return;
     img.style.animation="none";
     map();root.classList.add("lit");skip.hidden=false;
-    PEAKS.forEach(([x,y,n,h])=>{
+    const few=M.W<760;
+    PEAKS.forEach(([x,y,n,h,lift,minor])=>{
       const sx=M.ox+x*M.k,sy=M.oy+y*M.k;
-      if(sx<70||sx>M.W-70)return;
-      const d=document.createElement("div");d.className="peak";d.innerHTML=`<b>${n}</b>${h}`;
+      if(sx<70||sx>M.W-70||(few&&minor))return;
+      const d=document.createElement("div");d.className="peak"+(minor?" min":"");d.style.setProperty("--lift",(lift||0)*Math.min(1,M.k/.9)+"px");d.innerHTML=`<b>${n}</b>${h}`;
       d.style.left=sx+"px";d.style.top=sy+"px";d._x=x;hero.appendChild(d);labels.push(d);
     });
     const L=path.getTotalLength(),DUR=2300;let T=null;
