@@ -866,8 +866,8 @@ if(tc){topo();addEventListener("resize",topo)}
       if(Q.length||!path._end)raf=requestAnimationFrame(tick);
     })(performance.now());
     // el logo aparece calzado sobre el Fitz Roy real
-    at(()=>{svg.classList.remove("on");logo.style.transform=bigTransform();logo.classList.add("go","fit")},700+DUR-200);
-    at(()=>{svg.classList.add("out");labels.forEach(l=>l.classList.add("off"))},700+DUR+500);
+    at(()=>{svg.classList.remove("on");logo.style.transform=bigTransform();logo.classList.add("go","fit");labels.forEach(l=>l.classList.add("off"))},700+DUR-200);
+    at(()=>svg.classList.add("out"),700+DUR+500);
     // vuela a su lugar y aparecen los títulos
     at(()=>{
       const from=logo.style.transform;logo.style.transform="";logo.classList.remove("fit");
